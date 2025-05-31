@@ -1,6 +1,6 @@
 {
 	"name": "Bilibili Workshop Redirector",
-	"version": "1.0",
+	"version": "1.0.0",
 	"manifest_version": 3,
 	"description": "Automatically redirects Bilibili workshop detail URLs to download URLs.",
 	"permissions": ["declarativeNetRequest"],
