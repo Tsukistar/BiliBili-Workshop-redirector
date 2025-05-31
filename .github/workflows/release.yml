@@ -20,32 +20,55 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史以便读取提交信息
+          fetch-depth: 0 # 获取完整历史以便读取提交信息
 
-      # 读取 manifest.json 中的 version
+      # 读取 manifest.json 中的 version 并设置输出
       - name: Get version from manifest.json
         id: get_version
         run: |
+          # 使用 jq 提取版本号
           VERSION=$(jq -r '.version' manifest.json)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=version::$VERSION"
+          echo "Extracted version: $VERSION"
+          # 将版本号设置为步骤输出，使用新的 GITHUB_OUTPUT 语法
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      # 获取最新提交信息并设置输出
       - name: Get commit message
         id: get_commit
         run: |
+          # 获取最新提交的完整消息
+          # 注意：这里获取的是 commit message，而不是 release body 的格式
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_ENV
-          echo "::set-output name=commit_msg::$COMMIT_MSG"
-          echo "EOF" >> $GITHUB_ENV
+          echo "Extracted commit message:"
+          echo "$COMMIT_MSG"
+          
+          # 将提交信息设置为步骤输出
+          # 如果提交信息是多行的，需要使用分隔符
+          # 这里假设 commit_msg 会用于 body，直接作为字符串输出即可
+          # 如果 body 需要特别格式化，可以在此步骤或 release action 中处理
+          
+          # 定义一个独特的分隔符，确保它不会出现在 COMMIT_MSG 自身中
+          DELIMITER=$(uuidgen) # 使用 uuidgen 生成一个唯一的分隔符
+          echo "commit_msg<<$DELIMITER" >> "$GITHUB_OUTPUT"
+          echo "$COMMIT_MSG" >> "$GITHUB_OUTPUT"
+          echo "$DELIMITER" >> "$GITHUB_OUTPUT"
 
       # 创建 Release
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        # 推荐使用 softprops/action-gh-release@v2
+        # 它更现代化，功能更丰富，并且通常能更好地处理各种场景
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # 使用步骤的输出作为 tag_name 和 release_name
           tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: ${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          # 使用步骤的输出作为 release body
+          # softprops action 能够很好地处理多行输入作为 body
           body: ${{ steps.get_commit.outputs.commit_msg }}
           draft: false
           prerelease: false
+          # 如果需要上传文件，可以添加以下行
+          # files: |
+          #   ./your-extension-build-folder/*.zip
