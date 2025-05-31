@@ -1,0 +1,16 @@
+[
+	{
+		"id": 1,
+		"priority": 1,
+		"action": {
+			"type": "redirect",
+			"redirect": {
+				"regexSubstitution": "https://gf.bilibili.com/order/download/\\1"
+			}
+		},
+		"condition": {
+			"regexFilter": "^https://gf\\.bilibili\\.com/order/detail/([0-9]+)(\\?.*)?$",
+			"resourceTypes": ["main_frame"]
+		}
+	}
+]

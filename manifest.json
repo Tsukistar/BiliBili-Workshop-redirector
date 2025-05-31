@@ -1,0 +1,31 @@
+{
+	"name": "Bilibili Workshop Redirector",
+	"version": "1.0",
+	"manifest_version": 3,
+	"description": "Automatically redirects Bilibili workshop detail URLs to download URLs.",
+	"permissions": ["declarativeNetRequest"],
+	"host_permissions": ["https://gf.bilibili.com/*"],
+	"action": {
+		"default_popup": "popup.html",
+		"default_icon": {
+			"16": "icons/icon16.png",
+			"48": "icons/icon48.png",
+			"128": "icons/icon128.png"
+		},
+		"default_title": "Bilibili 工房下载页面跳转器"
+	},
+	"icons": {
+		"16": "icons/icon16.png",
+		"48": "icons/icon48.png",
+		"128": "icons/icon128.png"
+	},
+	"declarative_net_request": {
+		"rule_resources": [
+			{
+				"id": "ruleset_1",
+				"enabled": true,
+				"path": "rules.json"
+			}
+		]
+	}
+}
